@@ -58,18 +58,18 @@ while time.time() < END:
 	lux = colorutility.calculate_lux(r,g,b)
 
 	# Update most recent data
-	most_recent = open("../drafty/most-recent.csv", "w", encoding="utf-8")
+	most_recent = open("../drafty/_data/most-recent.csv", "w", encoding="utf-8")
 	most_recent.write("time,temp_c,temp_f,humidity,lux,color_temp,red,green,blue,clear\n")
 	most_recent.write("{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9}\n".format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c))
 	most_recent.close()
 	
 	# Add most recent data to running log
-	all_data = open("../drafty/all.csv", "a", encoding="utf-8")
+	all_data = open("../drafty/_data/all.csv", "a", encoding="utf-8")
 	all_data.write("{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9}\n".format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c))
 	all_data.close()
 	
 	# Push data to remote repo
-	subprocess.run("cd ../drafty && git add most-recent.csv && git add all.csv && git commit -m \"Auto update {0}\" && git push".format(now), shell=True)
+	subprocess.run("cd ../drafty && git add _data/most-recent.csv && git add _data/all.csv && git commit -m \"Auto update {0}\" && git push".format(now), shell=True)
 
 	# Sleep for the remainder of the pre-defined interval, or a minimum of 60 seconds
 	time.sleep(max(next_run - time.time(), 60))
