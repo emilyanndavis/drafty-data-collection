@@ -1,7 +1,7 @@
 # Drafty Data Collection
 
 ## What is Drafty?
-Drafty attempts to answer the question: "Just how drafty is it in that drafty room of the house?" A Raspberry Pi is installed in a poorly insulated enclosed porch and periodically takes readings of the ambient temperature, humidity, and light levels. 
+Drafty attempts to answer the question: "Just how drafty is it in that drafty room of the house?" A Raspberry Pi is installed in a poorly insulated enclosed porch and periodically takes readings of the ambient temperature, humidity, and light levels. For comparison with outdoor conditions, local weather data is retrieved from the National Weather Service.
 
 ## Setup
 ### Hardware and physical materials
@@ -21,7 +21,24 @@ The following software is required:
 - [pipenv](https://pypi.org/project/pipenv)
 
 ### Configuration
+#### Raspberry Pi
 Make sure I2C is enabled on your Raspberry Pi. You can find this setting in the raspi-config tool or via the desktop GUI under Preferences > Raspberry Pi Configuration > Interfaces.
+
+#### Local Weather
+Local weather data is retrieved from the [National Weather Service's API Web Service](https://www.weather.gov/documentation/services-web-api). You will need to configure a couple of details to ensure you get the data you want.
+1. Create a file at the root of this project and name it `weather_config.py`.
+2. Add the following lines to `weather_config.py`:
+    ```
+    station_id = ''
+    user_agent = ''
+    ```
+3. Choose a station to request weather observations from, and set `station_id` to the station's four-character identifier. You can find your nearest NWS station on this [list of all NWS Observed Weather Stations](https://forecast.weather.gov/stations.php).
+4. Choose a unique string to identify your application, and set `user_agent` to this value. Per the [NWS Weather API docs](https://www.weather.gov/documentation/services-web-api):
+    ```
+    A User Agent is required to identify your application. This string can be anything, and the more unique to your application the less likely it will be affected by a security event. If you include contact information (website or email), we can contact you if your string is associated to a security event. This will be replaced with an API key in the future.
+
+    User-Agent: (myweatherapp.com, contact@myweatherapp.com)
+    ```
 
 ## Running sensor tests
 1. First, ensure you have all the prerequisite hardware, software, and configuration listed in [Setup](#setup).
