@@ -14,6 +14,10 @@ from adafruit_apds9960.apds9960 import APDS9960
 from adafruit_apds9960 import colorutility
 import board
 
+# Modules for local weather data
+import requests
+from weather_config import weather_base_url, station_id, user_agent
+
 # Define total duration (how long to run program before shutting down)
 DURATION_HOURS = 12 
 DURATION_MINUTES = DURATION_HOURS * 60
@@ -41,6 +45,25 @@ APDS9960.color_integration_time = 72; # min 1, max 256, driver default 256
 def c_to_f(c):
     return c * 9 / 5 + 32
 
+# Request local weather data from NWS API
+def get_local_weather():
+	request_url = weather_base_url + "/stations/" + station_id + "/observations/latest"
+	request_headers = {'user-agent': user_agent}
+	try:
+		response = requests.get(request_url, headers=request_headers, timeout=5)
+		if (response.status_code != requests.codes.ok):
+			print('HTTP Error: NWS API returned status code', response.status_code)
+			return None
+		try:
+			response_json = response.json()
+			return response_json
+		except requests.exceptions.JSONDecodeError:
+			print('JSON Decode Error')
+			return None
+	except requests.exceptions.RequestException as e:
+		print('Request Error:', e)
+		return None		
+
 while time.time() < END:
 	# Collect data
 	next_run = time.time() + INTERVAL_SECONDS
@@ -57,19 +80,34 @@ while time.time() < END:
 		color_temp = colorutility.calculate_color_temperature(r,g,b)
 	lux = colorutility.calculate_lux(r,g,b)
 
+	# Fetch local weather data
+	response_json = get_local_weather()
+	# Parse weather data
+	if (response_json):
+		if response_json.get('properties'):
+			nws_conditions = response_json.get('properties').get('textDescription')
+			if response_json.get('properties').get('temperature'):
+				nws_temp_c = response_json.get('properties').get('temperature').get('value')
+				nws_temp_f = c_to_f(nws_temp_c)
+			if response_json.get('properties').get('relativeHumidity'):
+				nws_humidity = response_json.get('properties').get('relativeHumidity').get('value')
+
+	# Format data as CSV
+	csv_row = "{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9},{10:0.1f},{11:0.1f},{12:0.1f},{13}\n".format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c, nws_temp_c, nws_temp_f, nws_humidity, nws_conditions)
+
 	# Update most recent data
-	most_recent = open("../drafty/most-recent.csv", "w", encoding="utf-8")
-	most_recent.write("time,temp_c,temp_f,humidity,lux,color_temp,red,green,blue,clear\n")
-	most_recent.write("{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9}\n".format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c))
+	most_recent = open("../drafty/_data/most-recent.csv", "w", encoding="utf-8")
+	most_recent.write("time,temp_c,temp_f,humidity,lux,color_temp,red,green,blue,clear,nws_temp_c,nws_temp_f,nws_humidity,nws_conditions\n")
+	most_recent.write(csv_row)
 	most_recent.close()
 	
 	# Add most recent data to running log
-	all_data = open("../drafty/all.csv", "a", encoding="utf-8")
-	all_data.write("{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9}\n".format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c))
+	all_data = open("../drafty/_data/all.csv", "a", encoding="utf-8")
+	all_data.write(csv_row)
 	all_data.close()
 	
 	# Push data to remote repo
-	subprocess.run("cd ../drafty && git add most-recent.csv && git add all.csv && git commit -m \"Auto update {0}\" && git push".format(now), shell=True)
+	subprocess.run("cd ../drafty && git add _data/most-recent.csv && git add _data/all.csv && git commit -m \"Auto update {0}\" && git push".format(now), shell=True)
 
 	# Sleep for the remainder of the pre-defined interval, or a minimum of 60 seconds
 	time.sleep(max(next_run - time.time(), 60))

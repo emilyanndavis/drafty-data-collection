@@ -8,6 +8,7 @@ adafruit-blinka = "*"
 adafruit-circuitpython-ahtx0 = "*"
 adafruit-circuitpython-apds9960 = "*"
 "rpi.gpio" = "*"
+requests = "*"
 
 [dev-packages]
 
