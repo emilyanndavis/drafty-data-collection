@@ -43,7 +43,9 @@ APDS9960.color_integration_time = 72; # min 1, max 256, driver default 256
 
 # Utility function for converting Celsius to Fahrenheit
 def c_to_f(c):
-    return c * 9 / 5 + 32
+    if c:
+      return c * 9 / 5 + 32
+    return None
 
 # Request local weather data from NWS API
 def get_local_weather():
