@@ -16,7 +16,7 @@ import board
 
 # Modules for local weather data
 import requests
-from weather_config import weather_base_url, station_id, user_agent
+from weather_config import station_id, user_agent
 
 # Define total duration (how long to run program before shutting down)
 DURATION_HOURS = 12 
@@ -43,12 +43,13 @@ APDS9960.color_integration_time = 72; # min 1, max 256, driver default 256
 
 # Utility function for converting Celsius to Fahrenheit
 def c_to_f(c):
-    if c:
-      return c * 9 / 5 + 32
-    return None
+  if c:
+    return c * 9 / 5 + 32
+  return None
 
 # Request local weather data from NWS API
 def get_local_weather():
+	weather_base_url = 'https://api.weather.gov'
 	request_url = weather_base_url + "/stations/" + station_id + "/observations/latest"
 	request_headers = {'user-agent': user_agent}
 	try:
