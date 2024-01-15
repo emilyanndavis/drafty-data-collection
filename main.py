@@ -86,26 +86,32 @@ while time.time() < END:
 	# Fetch local weather data
 	response_json = get_local_weather()
 	# Parse weather data
-	if (response_json):
-		if response_json.get('properties'):
-			nws_conditions = response_json.get('properties').get('textDescription')
-			if not nws_conditions: 
-				nws_conditions = ''
-			if response_json.get('properties').get('temperature'):
-				nws_temp_c = response_json.get('properties').get('temperature').get('value')
-				if nws_temp_c: 
-					nws_temp_f = c_to_f(nws_temp_c)
-				else:					
-					nws_temp_c = ''
-					nws_temp_f = ''
-			if response_json.get('properties').get('relativeHumidity'):
-				nws_humidity = response_json.get('properties').get('relativeHumidity').get('value')
-				if not nws_humidity: 
-					nws_humidity = ''
+	try:
+		nws_conditions = response_json.get('properties').get('textDescription')
+	except:
+		nws_conditions = None
+	try:
+		nws_temp_c = response_json.get('properties').get('temperature').get('value')
+		nws_temp_f = c_to_f(nws_temp_c)
+	except:
+		nws_temp_c = None
+		nws_temp_f = None
+	try:
+		nws_humidity = response_json.get('properties').get('relativeHumidity').get('value')
+	except:
+		nws_humidity = None
 
 	# Format data as CSV
-	csv_row = "{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9},{10:0.1f},{11:0.1f},{12:0.1f},{13}\n".format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c, nws_temp_c, nws_temp_f, nws_humidity, nws_conditions)
-
+	csv_row = '{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9},'.format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c)
+	for prop in [nws_temp_c, nws_temp_f, nws_humidity]:
+		try:
+			csv_row += '{0:0.1f},'.format(prop)
+		except:
+			# If value cannot be formatted as a float, leave the field empty
+			csv_row += ','
+	if nws_conditions:
+		csv_row += '{0}\n'.format(nws_conditions)
+	
 	# Update most recent data
 	most_recent = open("../drafty/_data/most-recent.csv", "w", encoding="utf-8")
 	most_recent.write("time,temp_c,temp_f,humidity,lux,color_temp,red,green,blue,clear,nws_temp_c,nws_temp_f,nws_humidity,nws_conditions\n")
