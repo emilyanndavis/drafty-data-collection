@@ -89,11 +89,19 @@ while time.time() < END:
 	if (response_json):
 		if response_json.get('properties'):
 			nws_conditions = response_json.get('properties').get('textDescription')
+			if not nws_conditions: 
+				nws_conditions = ''
 			if response_json.get('properties').get('temperature'):
 				nws_temp_c = response_json.get('properties').get('temperature').get('value')
-				nws_temp_f = c_to_f(nws_temp_c)
+				if nws_temp_c: 
+					nws_temp_f = c_to_f(nws_temp_c)
+				else:					
+					nws_temp_c = ''
+					nws_temp_f = ''
 			if response_json.get('properties').get('relativeHumidity'):
 				nws_humidity = response_json.get('properties').get('relativeHumidity').get('value')
+				if not nws_humidity: 
+					nws_humidity = ''
 
 	# Format data as CSV
 	csv_row = "{0:%Y-%m-%d %H:%M:%S},{1:0.1f},{2:0.1f},{3:0.1f},{4:0.1f},{5:0.1f},{6},{7},{8},{9},{10:0.1f},{11:0.1f},{12:0.1f},{13}\n".format(now, temp_c, temp_f, humidity, lux, color_temp, r, g, b, c, nws_temp_c, nws_temp_f, nws_humidity, nws_conditions)
