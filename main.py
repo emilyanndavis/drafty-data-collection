@@ -111,7 +111,7 @@ while time.time() < END:
 			csv_row += ','
 	if nws_conditions:
 		csv_row += '{0}'.format(nws_conditions)
-	csv_row += '\n';
+	csv_row += '\n'
 	
 	# Update most recent data
 	most_recent = open("../drafty/_data/most-recent.csv", "w", encoding="utf-8")
