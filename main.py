@@ -110,7 +110,8 @@ while time.time() < END:
 			# If value cannot be formatted as a float, leave the field empty
 			csv_row += ','
 	if nws_conditions:
-		csv_row += '{0}\n'.format(nws_conditions)
+		csv_row += '{0}'.format(nws_conditions)
+	csv_row += '\n';
 	
 	# Update most recent data
 	most_recent = open("../drafty/_data/most-recent.csv", "w", encoding="utf-8")
