@@ -65,4 +65,4 @@ Local weather data is retrieved from the [National Weather Service's API Web Ser
 8. In `main.py`, locate the lines that initialize `DURATION_HOURS` and `INTERVAL_MINUTES`. Customize either or both of these values if desired.
 9. Install dependencies in the project directory with `pipenv install`.
 10. Run `pipenv run python3 main.py`. To ensure the program continues to run in the event of lost connection/network timeout (e.g., if you are running the program from a remote terminal via ssh), include `nohup`, like this: `pipenv run nohup python3 main.py`.
-11. If you are using the Drafty companion website, follow the instructions in the drafty README, under [Setting up your Drafty website](https://github.com/emilyanndavis/drafty/blob/main/README.md#setting-up-your-drafty-website).
+11. If you are using the Drafty companion website, follow the instructions in the drafty README, under [Setting up your Drafty website](https://github.com/emilyanndavis/drafty#setting-up-your-drafty-website).
