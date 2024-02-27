@@ -48,13 +48,21 @@ Local weather data is retrieved from the [National Weather Service's API Web Ser
 5. To test light/color/proximity/gestures, first comment/uncomment sections of `test_light-color-proximity-gesture.py` as desired, then run `pipenv run python3 test_light-color-proximity-gesture.py`.
 
 ## Running main.py
-**Warning 1: main.py schedules a shutdown of the machine it is running on. To avoid surprises, you may wish to comment out or remove that part of the code.**
+1. Ensure you have all the prerequisite hardware, software, and configuration listed in [Setup](#setup).
+2. Connect the sensor(s) according to their official documentation.
+3. Set up your data files. You have a couple of options:
+    - Create two empty files: `most-recent.csv` and `all.csv`. Where you store them is up to you.
+    - Alternatively: for the complete Drafty experience including the Jekyll-based website, fork and clone the [drafty repo](https://github.com/emilyanndavis/drafty). Find `most-recent.csv` and `all.csv` in the `_data` directory, and clear the contents of both files.
+4. In `main.py`, find all the references to `most-recent.csv` and `all.csv`, and make sure the relative paths point to the correct locations based on where your CSV files are stored. Update the paths if needed.
+5. If you plan to use the [Drafty companion website](https://github.com/emilyanndavis/drafty), and/or if you want to back up your data in a remote git repo: configure a method to automate authentication to your git repo. There are many ways to accomplish this. Here are just a couple of options:
+    - Use [PyGithub](https://pypi.org/project/PyGithub/) to connect to the GitHub API with a personal access token. (Be sure to store your token in a separate file, and add that file to your `.gitignore` to avoid publicly sharing your token by mistake!)
+    - Alternatively, load a shell script on your Raspberry Pi that adds your SSH key to the ssh-agent, as in this example in the GitHub docs: [Auto-launching ssh-agent on Git for Windows](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases?platform=windows#auto-launching-ssh-agent-on-git-for-windows). (Even though these instructions are for Windows, they will also work on Linux.)
 
-**Warning 2: main.py automatically pushes data to a remote git repo. This will fail unless you (1) have set up your own repo, (2) have updated the code to point to the correct directory & files, and (3) have implemented a method of automating authentication to your repo.**
+    There are certainly other solutions as well. Choose whichever method best suits your needs!
 
-1. First, read the warnings at the top of this section!
-2. Update the code according to your needs (e.g., skip system shutdown, update path/file names, modify time interval and/or duration, etc.).
-3. Ensure you have all the prerequisite hardware, software, and configuration listed in [Setup](#setup).
-4. Connect the sensor(s) according to their official documentation.
-5. Install dependencies in the project directory with `pipenv install`.
-6. Run `pipenv run python3 main.py`. To ensure the program continues to run in the event of lost connection/network timeout (e.g., if you are running the program from a remote terminal via ssh), include `nohup`, like this: `pipenv run nohup python3 main.py`.
+6. Alternatively, if you _do not_ plan to use the Drafty companion website, _do not_ want to back up your data in a remote git repo, and/or just want to skip this part for now: locate the line in `main.py` that contains `git commit` and `git push` commands, and remove it or comment it out.
+7. In `main.py`, locate the line that includes `sudo shutdown -P`. This line schedules a shutdown of the Raspberry Pi at the end of the specified duration. This is helpful if you are running your Pi on battery power and want to be sure it is safely shut down before you unplug it to recharge the battery. If you do not need this feature, remove or comment out that line of code.
+8. In `main.py`, locate the lines that initialize `DURATION_HOURS` and `INTERVAL_MINUTES`. Customize either or both of these values if desired.
+9. Install dependencies in the project directory with `pipenv install`.
+10. Run `pipenv run python3 main.py`. To ensure the program continues to run in the event of lost connection/network timeout (e.g., if you are running the program from a remote terminal via ssh), include `nohup`, like this: `pipenv run nohup python3 main.py`.
+11. If you are using the Drafty companion website, follow the instructions in the drafty README, under [Setting up your Drafty website](https://github.com/emilyanndavis/drafty/blob/main/README.md#setting-up-your-drafty-website).
